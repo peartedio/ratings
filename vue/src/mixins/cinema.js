@@ -1,9 +1,11 @@
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 
 export const helpCinema = {
   methods: {
-    ...mapActions('cinema', [
-      'saveCinema'
+    ...mapMutations('cinema', [
+      'addCinema',
+      'editCinema',
+      'removeCinema'
     ])
   },
   computed: {
