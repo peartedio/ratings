@@ -10,15 +10,17 @@
       <div class="cinema-card__info__item">{{ cinema.name }}</div>
       <div class="cinema-card__info__item">{{ cinema.originName }}</div>
       <div class="cinema-card__info__item">{{ cinema.producer }}</div>
-      <div class="cinema-card__info__item">{{ cinema.date }}</div>
+      <div class="cinema-card__info__item">{{ cinema.date | dateFormat }}</div>
     </div>
   </div>
 </template>
 
 <script>
+import { helpCommon } from "@/mixins/common"
 
 export default {
   name: 'CinemaCard',
+  mixins: [helpCommon],
   props: {
     cinema: Object,
     default: () => (null)
