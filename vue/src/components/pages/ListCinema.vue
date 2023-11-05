@@ -1,5 +1,10 @@
 <template>
   <PageLayout>
+    <div class="header">
+      <RouterLink :to="{ name: routeNames.HOME }" replace>
+        <ElButton type="primary" icon="el-icon-arrow-left">Главная страница</ElButton>
+      </RouterLink>
+    </div>
     <section class="p-16">
       <div class="cinema-header">
         <h1>Фильмы</h1>
@@ -58,7 +63,7 @@ const filters = [
   },
   {
     field: "score",
-    label: "По рейтингу"
+    label: "По оценке"
   },
   {
     field: "date",
@@ -67,6 +72,10 @@ const filters = [
   {
     field: "name",
     label: "По названию"
+  },
+  {
+    field: "rating",
+    label: "По рейтингу"
   }
 ]
 const filterOrder = [
@@ -113,7 +122,7 @@ export default {
     films () {
       return this.getFilmsWithFilter({
         field: this.selectedFilter,
-        needReverce: this.selectedFilter ? this.needReverce : false
+        reverce: this.selectedFilter ? this.needReverce : false
       })
     }
   },
