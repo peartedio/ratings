@@ -1,6 +1,19 @@
 <template>
   <div class="cinema-form">
     <div class="cinema-form__field">
+      <ElButton
+        type="primary"
+        class="load-by-id"
+        @click="() => changeVisibleFormById()"
+      >
+      {{  isVisibleLoadFormById ? "Отмена" : "Загрузить по id"  }}
+      </ElButton>
+    </div>
+    <div v-if="isVisibleLoadFormById" class="cinema-form__load-by-id cinema-form__field">
+      <ElInput v-model="id" placeholder="ID фильма"/>
+      <ElButton icon="el-icon-download" @click="() => loadFilmFromApi()" circle />
+    </div>
+    <div class="cinema-form__field">
       <ElInput v-model="form.name" placeholder="Название фильма" />
     </div>
     <div class="cinema-form__field">
@@ -11,11 +24,10 @@
     </div>
     <div class="cinema-form__field">
       <ElDatePicker
-        v-model="form.date"
-        type="date"
-        value-format="timestamp"
-        placeholder="Дата выхода фильма"
-        format="dd.MM.yyyy"
+        v-model="form.year"
+        type="year"
+        placeholder="Год"
+        value-format="yyyy"
       />
     </div>
     <div class="cinema-form__field">
@@ -26,12 +38,14 @@
       <ElRate v-model="form.score" :colors="getSroceIcons" class="cinema-form__field" />
     </div>
     <div class="cinema-form__field">
-      <ElButton type="primary" @click="() => handleClick()">{{ btnText }}</ElButton>
+      <ElButton type="success" @click="() => handleClick()">{{ btnText }}</ElButton>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'FormInput',
   props: {
@@ -50,10 +64,12 @@ export default {
         name: '',
         originName: '',
         producer: '',
-        date: null,
+        year: '',
         previewUrl: '',
         score: null
-      }
+      },
+      id: null,
+      isVisibleLoadFormById: false
     }
   },
   mounted: function () {
@@ -70,8 +86,30 @@ export default {
     }
   },
   methods: {
+    ...mapActions('cinema', [
+      'loadFilmById'
+    ]),
     handleClick () {
       this.$emit('btnClick', this.form)
+    },
+    changeVisibleFormById () {
+      this.isVisibleLoadFormById = !this.isVisibleLoadFormById
+    },
+    loadFilmFromApi () {
+      this.loadFilmById(this.id)
+        .then(data => {
+          this.form = {
+            ...this.form,
+            name: data.nameRu,
+            originName: data.nameOriginal,
+            year: String(data.year),
+            previewUrl: data.posterUrlPreview,
+            coverUrl: data.coverUrl
+          }
+        })
+        .catch(error => {
+          this.$message.error(error)
+        })
     }
   }
 }
@@ -81,6 +119,12 @@ export default {
 .cinema-form {
   &__field {
     margin-top: 16px;
+  }
+
+  &__load-by-id {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
   }
 }
 </style>
