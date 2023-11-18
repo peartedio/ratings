@@ -18,6 +18,7 @@ export const genHash = (length = 32) => {
 
 const filmsKey = 'CINEMA_STORE'
 const ratingFilmsKey = 'RATING_FILMS_STORE'
+const apiKey = "API_KEY"
 
 const syncFilmsWithLocalStorage = (state) => {
   localStorage.setItem(filmsKey, JSON.stringify(state.films))
@@ -25,20 +26,21 @@ const syncFilmsWithLocalStorage = (state) => {
 const syncRatingFilmsWithLocalStorage = (state) => {
   localStorage.setItem(ratingFilmsKey, JSON.stringify(state.rating))
 }
+const syncApiKeyWithLocalStorage = (state) => {
+  localStorage.setItem(apiKey, state.keyApi)
+}
 
 const axiosInstance = axios.create({
-  baseURL: 'https://kinopoiskapiunofficial.tech/api/v2.2',
-  headers: {
-    'X-API-KEY': '', // TODO: указать индивидуальный ключ для работы с API
-    'Content-Type': 'application/json',
-  },
+  baseURL: 'https://kinopoiskapiunofficial.tech/api/v2.2'
 })
+axiosInstance.defaults.headers['X-API-KEY'] = localStorage.getItem(apiKey) || ""
 
 export default {
   namespaced: true,
   state: {
     films: JSON.parse(localStorage.getItem(filmsKey)) || [],
-    rating: JSON.parse(localStorage.getItem(ratingFilmsKey)) || {}
+    rating: JSON.parse(localStorage.getItem(ratingFilmsKey)) || {},
+    keyApi: localStorage.getItem(apiKey) || ""
   },
   getters: {
     getFilms: (state) => state.films,
@@ -91,6 +93,19 @@ export default {
     clearRating (state) {
       state.rating = {}
       syncRatingFilmsWithLocalStorage(state)
+    },
+    saveApiKey (state, payload) {
+      state.keyApi = payload
+      syncApiKeyWithLocalStorage(state)
+      axiosInstance.defaults.headers['X-API-KEY'] = payload
+    },
+    setFilms (state, payload) {
+      state.films = payload
+      syncFilmsWithLocalStorage(state)
+    },
+    setRatings (state, payload) {
+      state.rating = payload
+      syncRatingFilmsWithLocalStorage(state)
     }
   },
   actions: {
@@ -109,6 +124,23 @@ export default {
     createFilm: ({ commit }, payload) => new Promise((resolve) => {
       commit('addCinema', payload)
       resolve(payload.id)
+    }),
+    importDataFromFile: ({ commit }, payload) => new Promise((resolve, reject) => {
+      const fileReader = new FileReader()
+      fileReader.readAsText(payload.raw)
+      fileReader.onload = () => {
+        const dataAsJson = JSON.parse(fileReader.result)
+        if (dataAsJson.films) {
+          commit('setFilms', dataAsJson.films)
+        }
+        if (dataAsJson.rating) {
+          commit('setRatings', dataAsJson.rating)
+        }
+        return resolve()
+      }
+      fileReader.onerror = () => {
+        return reject("Не удалось загрузить файл")
+      }
     })
   }
 }
