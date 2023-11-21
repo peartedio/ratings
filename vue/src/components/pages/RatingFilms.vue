@@ -1,66 +1,61 @@
 <template>
   <PageLayout>
-    <div class="header">
-      <RouterLink :to="{ name: routeNames.HOME }" replace>
-        <ElButton type="primary" icon="el-icon-arrow-left">Главная страница</ElButton>
-      </RouterLink>
-    </div>
+    <section class="p-16 rating-header">
+      <h1>Рейтинг фильмов</h1>
+      <div class="d-flex gap-6">
+        <ElButton type="danger" size="small" @click="() => resetRatings()">Сбросить</ElButton>
+        <ElButton type="warning" size="small" @click="() => clearRating()">Составить</ElButton>
+      </div>
+    </section>
+
     <section class="p-16">
-      <div v-if="isFilmsEmpty">
+      <div v-if="films.length === 0">
         <h1>Фильмы не найдены. Необходимо добавить фильм для составления рейтинга</h1>
       </div>
-      <div v-else-if="getFilmsForRaiting">
+      <div v-else-if="getFilmsForRating">
         <h1>Составление рейтинга</h1>
         <div class="rating">
-          <div class="rating__cinema">
-            <CinemaPreview :cinema="getFilmsForRaiting.firstFilm" />
+          <CinemaPreview :cinema="getFilmsForRating.firstFilm" :rating="getRatings.firstRating">
             <div class="rating__controls">
-              <ElButton @click="() => addRating(getFilmsForRaiting.firstFilm, 10)" type="success">{{ "+10" }}</ElButton>
-              <div class="rating__controls__container">
-                <ElButton @click="() => addRating(getFilmsForRaiting.firstFilm, 1)" type="primary">{{ "+1" }}</ElButton>
-                <span>{{ getRatings.firstRating }}</span>
-              </div>
+              <ElButton @click="() => addRating(getFilmsForRating.firstFilm, 10, getFilmsForRating.secondFilm)" type="success">+10</ElButton>
+              <ElButton @click="() => addRating(getFilmsForRating.firstFilm, 1, getFilmsForRating.secondFilm)" type="primary">+1</ElButton>
             </div>
-          </div>
-          <div class="rating__divider" />
-          <div class="rating__cinema">
-            <CinemaPreview :cinema="getFilmsForRaiting.secondFilm" />
+          </CinemaPreview>
+
+          <CinemaPreview :cinema="getFilmsForRating.secondFilm" :rating="getRatings.secondRating">
             <div class="rating__controls">
-              <div class="rating__controls__container">
-                <span>{{ getRatings.secondRating }}</span>
-                <ElButton @click="() => addRating(getFilmsForRaiting.secondFilm, 1)" type="primary">{{ "+1" }}</ElButton>
-              </div>
-              <ElButton @click="() => addRating(getFilmsForRaiting.secondFilm, 10)" type="success">{{ "+10" }}</ElButton>
+              <ElButton @click="() => addRating(getFilmsForRating.secondFilm, 1, getFilmsForRating.firstFilm)" type="primary">+1</ElButton>
+              <ElButton @click="() => addRating(getFilmsForRating.secondFilm, 10, getFilmsForRating.firstFilm)" type="success">+10</ElButton>
             </div>
-          </div>
+          </CinemaPreview>
         </div>
       </div>
-      <div v-else class="rating-header">
-        <h1>Рейтинг составлен</h1>
-        <ElButton @click="() => clear()" type="primary">Очистить список</ElButton>
+      <div v-else>
+        <div class="page-msg">
+          <span>Рейтинг составлен</span>
+        </div>
       </div>
     </section>
   </PageLayout>
 </template>
 
 <script>
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 import PageLayout from '../parts/PageLayout'
 import CinemaPreview from '../cinema/CinemaPreview.vue';
-import { mapGetters, mapMutations } from 'vuex';
-import { RouterLink } from 'vue-router';
 import { RouteNames } from '@/router/routes';
 
 export default {
   name: "RatingFilms",
   components: {
     PageLayout,
-    RouterLink,
     CinemaPreview
   },
   computed: {
     ...mapGetters('cinema', [
+      'getFilmsWithFilter',
       'getRatingFilms',
-      'getFilmsWithFilter'
+      'getDependsFilms',
     ]),
     routeNames () {
       return RouteNames
@@ -71,28 +66,27 @@ export default {
         reverse: true
       })
     },
-    isFilmsEmpty () {
-      return this.films.size == 0
-    },
-    getFilmsForRaiting () {
-      const rating = this.getRatingFilms
-      const films = this.films
-      for (let i = 0; i < films.length - 1; i++) {
-        const firstFilm = films[i]
-        const secondFilm = films[i + 1]
-        const firstRating = rating[firstFilm.id] || 0
-        const secondRating = rating[secondFilm.id] || 0
-        if (firstRating == secondRating) {
-          return {
-            firstFilm,
-            secondFilm
+    getFilmsForRating () {
+      for (let i = 0; i < this.films.length - 1; i++) {
+        const firstFilm = this.films[i]
+
+        for (let j = i + 1; j < this.films.length; j++) {
+          const secondFilm = this.films[j]
+          const firstRating = this.getRatingFilms[firstFilm.id] || 0
+          const secondRating = this.getRatingFilms[secondFilm.id] || 0
+
+          if (firstRating === secondRating) {
+            return {
+              firstFilm,
+              secondFilm
+            }
           }
         }
       }
       return null
     },
     getRatings () {
-      const currentFilms = this.getFilmsForRaiting
+      const currentFilms = this.getFilmsForRating
       return {
         firstRating: this.getRatingFilms[currentFilms.firstFilm.id] || 0,
         secondRating: this.getRatingFilms[currentFilms.secondFilm.id] || 0
@@ -104,14 +98,38 @@ export default {
       'updateRatingCinema',
       'clearRating'
     ]),
-    addRating (cinema, count) {
+    ...mapActions('cinema', [
+      'resetRatings',
+    ]),
+    addRating (cinema, count, sub) {
       this.updateRatingCinema({
         id: cinema.id,
+        subId: sub.id,
         count: count
       })
-    },
-    clear () {
-      this.clearRating()
+    }
+  },
+  watch: {
+    getFilmsForRating: {
+      handler (v) {
+        if (!v) {
+          return
+        }
+        const firstDepends = this.getDependsFilms[v.firstFilm.id] || []
+        const secondDepends = this.getDependsFilms[v.secondFilm.id] || []
+
+        if (firstDepends.includes(v.secondFilm.id)) {
+          this.updateRatingCinema({
+            id: v.firstFilm.id,
+            count: 1
+          })
+        } else if (secondDepends.includes(v.firstFilm.id)) {
+          this.updateRatingCinema({
+            id: v.secondFilm.id,
+            count: 1
+          })
+        }
+      }
     }
   }
 }
@@ -120,13 +138,13 @@ export default {
 <style scoped lang="less">
 .rating-header {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
 }
 
 .rating {
-  display: grid;
-  grid-template-columns: 1fr 1px 1fr;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 20px;
   margin: 16px;
   margin-top: 40px;
@@ -138,7 +156,8 @@ export default {
   &__cinema {
     display: flex;
     flex-direction: column;
-    widows: 100%;
+    border-radius: 6px;
+    overflow: hidden;
   }
 
   &__controls {

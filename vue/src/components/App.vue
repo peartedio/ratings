@@ -57,39 +57,28 @@ h2 {
   display: flex;
 }
 
+.gap-20 {
+  gap: 20px;
+}
+
+.fs-12 {
+  font-size: 12px;
+}
+
+.c-gray {
+  color: #575757;
+}
+
 .header {
   margin-bottom: 16px;
 }
 
-.rcms {
-
-  &-divider {
-
-    &-h {
-      width: 100%;
-      height: @sizeBorderDefault;
-      background-color: @cBaseTwo;
-    }
-
-    &-v {
-
-    }
-  }
-
-  &-loading {
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 1;
-      background: rgba(100, 100, 100, 0.5);
-      cursor: wait;
-    }
-  }
+.page-msg {
+  display: flex;
+  height: 200px;
+  align-items: center;
+  justify-content: center;
+  font-family: @ffOne;
+  color: #727272;
 }
 </style>

@@ -1,12 +1,14 @@
 <template>
   <PageLayout>
-    <div class="header">
-      <RouterLink :to="{ name: routeNames.LIST_CINEMA }" replace>
-        <ElButton type="primary" icon="el-icon-arrow-left">Главная страница</ElButton>
-      </RouterLink>
-    </div>
-    <section class="p-16">
+    <section v-if="cinema" class="p-16">
       <div class="cinema-details">
+        <div class="cinema-details__preview" :style="previewStyle"/>
+        <div class="cinema-details__info">
+          <div class="cinema-details__info__item cinema-details__info__name">{{ cinema.name }}</div>
+          <div class="cinema-details__info__item">Оригинальное название: {{ cinema.originName }}</div>
+          <div class="cinema-details__info__item">Режиссер: {{ cinema.producer }}</div>
+          <div class="cinema-details__info__item">Год: {{ cinema.year }}</div>
+        </div>
         <div class="cinema-details__header">
           <ElRate v-model="getScore" disabled :colors="getSroceIcons" />
           <div class="cinema-details__header__buttons">
@@ -16,13 +18,6 @@
             <ElButton type="danger" icon="el-icon-delete" circle @click="() => deleteCinema()" />
           </div>
         </div>
-        <div class="cinema-card__preview" :style="previewStyle"/>
-        <div class="cinema-details__info">
-          <div class="cinema-details__info__item cinema-details__info__name">{{ cinema.name }}</div>
-          <div class="cinema-details__info__item">Оригинальное название: {{ cinema.originName }}</div>
-          <div class="cinema-details__info__item">Режиссер: {{ cinema.producer }}</div>
-          <div class="cinema-details__info__item">Год: {{ cinema.year }}</div>
-        </div>
       </div>
     </section>
   </PageLayout>
@@ -31,15 +26,13 @@
 <script>
 import PageLayout from '../parts/PageLayout'
 import { helpCinema } from "@/mixins/cinema";
-import { RouterLink } from 'vue-router'
 import { RouteNames } from '@/router/routes'
 
 export default {
   name: 'CinemaDetails',
   mixins: [helpCinema],
   components: {
-    PageLayout,
-    RouterLink
+    PageLayout
   },
   computed: {
     getScore () {
@@ -49,15 +42,14 @@ export default {
       return ['#99A9BF', '#F7BA2A', '#FF9900']
     },
     cinema () {
-      const cinemaId = this.$route.params.id
-      return this.getFilm(cinemaId)
+      return this.getFilm(this.$route.params.id)
     },
     routeNames() {
       return RouteNames
     },
     previewStyle () {
       return {
-        backgroundImage: `url(${this.cinema.coverUrl || ''})`,
+        backgroundImage: `url(${this.cinema.previewUrl || ''})`,
         backgroundSize: `cover`,
         backgroundPosition: `center`
       }
@@ -74,12 +66,7 @@ export default {
 
 <style scoped lang="less">
 .cinema-details {
-  display: grid;
-  grid-template:
-    "header" auto
-    "cover" 300px
-    "info" auto;
-  gap: 16px;
+  display: flex;
 
   &__header {
     grid-area: header;
@@ -97,8 +84,8 @@ export default {
   }
 
   &__preview {
-    grid-area: cover;
-    background: #bababa;
+    width: 40%;
+    background-color: #bababa;
     background-size: cover;
     background-position: center;
   }

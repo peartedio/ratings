@@ -1,12 +1,7 @@
 <template>
   <PageLayout>
-    <div class="header">
-      <RouterLink :to="{ name: routeNames.HOME }" replace>
-        <ElButton type="primary" icon="el-icon-arrow-left">Главная страница</ElButton>
-      </RouterLink>
-    </div>
     <section class="p-16">
-      <h1>Добавление рейтинга фильма</h1>
+      <h1>Добавление фильма</h1>
       <CinemaForm btnText="Добавить фильм" @btnClick="(cinema) => saveCinema(cinema)" />
     </section>
   </PageLayout>
@@ -17,7 +12,6 @@ import PageLayout from '../parts/PageLayout'
 import CinemaForm from "../forms/CinemaForm"
 import { RouteNames } from '@/router/routes'
 import { helpCinema } from "@/mixins/cinema"
-import { RouterLink } from 'vue-router'
 import { mapActions } from 'vuex'
 
 export default {
@@ -25,7 +19,6 @@ export default {
   mixins: [helpCinema],
   components: {
     PageLayout,
-    RouterLink,
     CinemaForm
   },
   computed: {
@@ -39,8 +32,8 @@ export default {
     ]),
     saveCinema (cinema) {
       this.createFilm(cinema)
-        .then((filmId) => {
-          this.$router.push({ name: RouteNames.CINEMA_DETAILS, params: { id: filmId } })
+        .then((response) => {
+          this.$router.push({ name: RouteNames.CINEMA_DETAILS, params: { id: response.film.id } })
         })
     }
   }

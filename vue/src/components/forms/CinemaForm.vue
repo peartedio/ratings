@@ -1,6 +1,6 @@
 <template>
   <div class="cinema-form">
-    <div class="cinema-form__field">
+    <div class="cinema-form__load-by-id">
       <ElButton
         type="primary"
         class="load-by-id"
@@ -8,10 +8,10 @@
       >
       {{  isVisibleLoadFormById ? "Отмена" : "Загрузить по id"  }}
       </ElButton>
-    </div>
-    <div v-if="isVisibleLoadFormById" class="cinema-form__load-by-id cinema-form__field">
-      <ElInput v-model="id" placeholder="ID фильма"/>
-      <ElButton icon="el-icon-download" @click="() => loadFilmFromApi()" circle />
+      <div v-if="isVisibleLoadFormById" class="cinema-form__load-by-id">
+        <ElInput v-model="id" placeholder="ID фильма"/>
+        <ElButton icon="el-icon-download" circle @click="() => loadFilmFromApi()" />
+      </div>
     </div>
     <div class="cinema-form__field">
       <ElInput v-model="form.name" placeholder="Название фильма" />
@@ -28,14 +28,18 @@
         type="year"
         placeholder="Год"
         value-format="yyyy"
+        style="width: 100%"
       />
     </div>
     <div class="cinema-form__field">
       <ElInput v-model="form.previewUrl" placeholder="Ссылка на обложку" />
     </div>
+    <div v-if="form.kinopoiskId" class="cinema-form__field">
+      <ElInput v-model="form.kinopoiskId" placeholder="Кинопоиск ID" />
+    </div>
     <div class="cinema-form__field">
       <span>Оценка фильма</span>
-      <ElRate v-model="form.score" :colors="getSroceIcons" class="cinema-form__field" />
+      <ElRate v-model="form.score" :colors="getSroceIcons" class="cinema-form__field" :max="10" />
     </div>
     <div class="cinema-form__field">
       <ElButton type="success" @click="() => handleClick()">{{ btnText }}</ElButton>
@@ -47,7 +51,7 @@
 import { mapActions } from 'vuex'
 
 export default {
-  name: 'FormInput',
+  name: 'CinemaForm',
   props: {
     btnText: {
       type: String,
@@ -66,7 +70,8 @@ export default {
         producer: '',
         year: '',
         previewUrl: '',
-        score: null
+        score: null,
+        kinopoiskId: ''
       },
       id: null,
       isVisibleLoadFormById: false
@@ -104,7 +109,8 @@ export default {
             originName: data.nameOriginal,
             year: String(data.year),
             previewUrl: data.posterUrlPreview,
-            coverUrl: data.coverUrl
+            coverUrl: data.coverUrl,
+            kinopoiskId: data.kinopoiskId
           }
         })
         .catch(error => {
