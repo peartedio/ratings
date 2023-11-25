@@ -20,6 +20,7 @@ const FILMS_KEY = 'CINEMA_STORE'
 const RATING_FILMS_KEY = 'RATING_FILMS_STORE'
 const DEPENDS_KEY = 'DEPENDS_STORE'
 const API_KEY = "API_KEY"
+const USER_GROUP_KEY = "USER_GROUP_KEY"
 
 const syncFilmsWithLocalStorage = (state) => {
   localStorage.setItem(FILMS_KEY, JSON.stringify(state.films))
@@ -39,7 +40,7 @@ const axiosInstance = axios.create({
 })
 axiosInstance.defaults.headers['X-API-KEY'] = localStorage.getItem(API_KEY) || ""
 
-const jsonPathFiles = '/files/films.json'
+const JSON_PATH_FILES = '/files/films.json'
 
 export default {
   namespaced: true,
@@ -47,15 +48,25 @@ export default {
     films: JSON.parse(localStorage.getItem(FILMS_KEY)) || [],
     rating: JSON.parse(localStorage.getItem(RATING_FILMS_KEY)) || {},
     depends: JSON.parse(localStorage.getItem(DEPENDS_KEY)) || {},
-    keyApi: localStorage.getItem(API_KEY) || ""
+    keyApi: localStorage.getItem(API_KEY) || "",
+    userGroup: localStorage.getItem(USER_GROUP_KEY) || "",
   },
   getters: {
+    getJSON: (state) => ({
+      films: state.films,
+      rating: state.rating,
+      depends: state.depends
+    }),
+    isAdmin: (state) => (state.userGroup === 'ADMIN'),
     getFilms: (state) => state.films,
     getFilm: (state) => (id) => state.films.find((film) => film.id == id),
     getRatingFilms: (state) => state.rating,
     getDependsFilms: (state) => state.depends,
-    getFilmsWithFilter: (state) => ({ field, reverse }) => {
-      const films = state.films.slice()
+    getFilmsWithFilter: (state) => ({ field, reverse, type }) => {
+      let films = state.films.slice()
+      if (type && type !== 'ALL') {
+        films = films.filter(i => i.type === type)
+      }
       const rating = state.rating
       if (!field) {
         return films.sort((a, b) => a["date"] - b["date"])
@@ -138,6 +149,10 @@ export default {
     setRatings (state, payload) {
       state.rating = payload
       syncRatingFilmsWithLocalStorage(state)
+    },
+    setDepends (state, payload) {
+      state.depends = payload
+      syncDependsFilmsWithLocalStorage(state)
     }
   },
   actions: {
@@ -162,13 +177,16 @@ export default {
       return resolve({ film })
     }),
     resetRatings: ({ commit }) => {
-      axios.get(jsonPathFiles)
+      axios.get(JSON_PATH_FILES)
         .then((r) => {
           if (r.data.films) {
             commit('setFilms', r.data.films)
           }
           if (r.data.rating) {
             commit('setRatings', r.data.rating)
+          }
+          if (r.data.depends) {
+            commit('setDepends', r.data.depends)
           }
         })
     },
@@ -182,6 +200,9 @@ export default {
         }
         if (dataAsJson.rating) {
           commit('setRatings', dataAsJson.rating)
+        }
+        if (dataAsJson.depends) {
+          commit('setDepends', dataAsJson.depends)
         }
         return resolve()
       }

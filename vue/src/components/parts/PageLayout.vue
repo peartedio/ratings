@@ -32,7 +32,7 @@
             {{ getButtonsText.addCinema }}
           </ElButton>
         </RouterLink>
-        <RouterLink :to="{ name: routeNames.SETTINGS }" class="page-menu__item">
+        <RouterLink v-if="isAdmin" :to="{ name: routeNames.SETTINGS }" class="page-menu__item">
           <ElButton
             type="info"
             icon="el-icon-setting"
@@ -51,6 +51,7 @@
 
 <script>
 import { RouteNames } from "@/router/routes";
+import { mapGetters } from "vuex";
 
 export default {
   name: 'PageLayout',
@@ -65,6 +66,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('cinema', [
+      'isAdmin'
+    ]),
     routeNames () {
       return RouteNames
     },

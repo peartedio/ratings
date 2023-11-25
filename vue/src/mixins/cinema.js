@@ -11,7 +11,8 @@ export const helpCinema = {
   computed: {
     ...mapGetters('cinema', [
       'getFilms',
-      'getFilm'
+      'getFilm',
+      'getRatingFilms'
     ])
   }
 }

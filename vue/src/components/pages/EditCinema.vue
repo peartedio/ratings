@@ -2,7 +2,7 @@
   <PageLayout>
     <section class="p-16">
       <h1>Редактирование фильма</h1>
-      <CinemaForm :btnText="editCinemaBtnText" :cinema="cinema" @btnClick="(cinema) => changeCinema(cinema)" />
+      <CinemaForm btnText="Сохранить изменения" :edit-mode="true" :cinema="cinema" @btnClick="(cinema) => changeCinema(cinema)" />
     </section>
   </PageLayout>
 </template>
@@ -22,11 +22,7 @@ export default {
   },
   computed: {
     cinema () {
-      const cinemaId = this.$route.params.id
-      return this.getFilm(cinemaId)
-    },
-    editCinemaBtnText () {
-      return "Сохранить изменения"
+      return this.getFilm(this.$route.params.id)
     },
     routeNames() {
       return RouteNames
@@ -35,7 +31,7 @@ export default {
   methods: {
     changeCinema (cinema) {
       this.editCinema(cinema)
-      this.$router.push({ name: RouteNames.LIST_CINEMA })
+      this.$router.push({ name: RouteNames.CINEMA_DETAILS, params: { id: cinema.id } })
     }
   }
 }

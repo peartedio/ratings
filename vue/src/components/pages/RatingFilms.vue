@@ -3,14 +3,16 @@
     <section class="p-16 rating-header">
       <h1>Рейтинг фильмов</h1>
       <div class="d-flex gap-6">
-        <ElButton type="danger" size="small" @click="() => resetRatings()">Сбросить</ElButton>
-        <ElButton type="warning" size="small" @click="() => clearRating()">Составить</ElButton>
+        <ElButton type="danger" size="small" @click="() => handlerResetRatings()">Сбросить</ElButton>
+        <ElButton type="warning" size="small" @click="() => handlerClearRating()">Составить</ElButton>
       </div>
     </section>
 
     <section class="p-16">
       <div v-if="films.length === 0">
-        <h1>Фильмы не найдены. Необходимо добавить фильм для составления рейтинга</h1>
+        <div class="page-msg">
+          <span>Список пуст. Необходимо пополнить список для составления рейтинга</span>
+        </div>
       </div>
       <div v-else-if="getFilmsForRating">
         <h1>Составление рейтинга</h1>
@@ -107,6 +109,26 @@ export default {
         subId: sub.id,
         count: count
       })
+    },
+    handlerResetRatings () {
+      this.$confirm('Вы хотите сбросить список фильмов и рейтинг на стандартный?', 'Внимание!', {
+        confirmButtonText: 'Да',
+        cancelButtonText: 'Нет',
+        type: 'warning'
+      })
+        .then(() => {
+          this.resetRatings()
+        });
+    },
+    handlerClearRating () {
+      this.$confirm('Вы хотите очистить текущий рейтинг и составить новый?', 'Внимание!', {
+        confirmButtonText: 'Да',
+        cancelButtonText: 'Нет',
+        type: 'warning'
+      })
+        .then(() => {
+          this.clearRating()
+        });
     }
   },
   watch: {
@@ -139,6 +161,10 @@ export default {
 .rating-header {
   display: flex;
   justify-content: space-between;
+
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
+  }
 }
 
 .rating {
@@ -146,8 +172,12 @@ export default {
   justify-content: center;
   align-items: center;
   gap: 20px;
-  margin: 16px;
-  margin-top: 40px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  @media screen and (max-width: 600px) {
+    gap: 5px;
+  }
 
   &__divider {
     background-color: gray;
@@ -164,7 +194,10 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-top: 20px;
+
+    @media screen and (max-width: 600px) {
+      margin-top: 5px;
+    }
 
     &__container {
       display: flex;

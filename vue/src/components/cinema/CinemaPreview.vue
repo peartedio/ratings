@@ -13,6 +13,11 @@
             {{ cinema.score || '-' }}
             <i class="el-icon-star-on" style="color: orange" />
           </span>
+          <RouterLink :to="{ name: routeNames.CINEMA_DETAILS, params: { id: cinema.id } }">
+            <span style="color: gray">
+              <i class="el-icon-info" style="color: gray" />
+            </span>
+          </RouterLink>
         </div>
       </div>
       <div>
@@ -23,6 +28,8 @@
 </template>
 
 <script>
+import { RouteNames } from "@/router/routes";
+
 export default {
   name: "CinemaPreview",
   props: {
@@ -33,9 +40,12 @@ export default {
     }
   },
   computed: {
+    routeNames () {
+      return RouteNames
+    },
     styles () {
       return {
-        backgroundImage: `url(${this.cinema.previewUrl || ''})`,
+        backgroundImage: `url(${this.cinema.previewUrl || '/files/film.png'})`,
         backgroundSize: `cover`,
         backgroundPosition: `center`
       }
@@ -54,6 +64,10 @@ export default {
   border-radius: 6px;
   width: 300px;
   height: 400px;
+
+  @media screen and (max-width: 600px) {
+    height: 260px;
+  }
 
   &__info {
     color: white;

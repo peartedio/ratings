@@ -62,17 +62,14 @@ export default {
   computed: {
     ...mapGetters('cinema', [
       'getFilms',
+      'getJSON',
       'getRatingFilms'
     ]),
     routeNames () {
       return RouteNames
     },
     downloadRef () {
-      const data = {
-        films: this.getFilms,
-        rating: this.getRatingFilms
-      }
-      return 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data))
+      return 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.getJSON))
     }
   },
   methods: {

@@ -1,28 +1,41 @@
 <template>
   <div class="cinema-form">
-    <div class="cinema-form__load-by-id">
+    <div v-if="isAdmin" class="cinema-form__load-by-id">
       <ElButton
         type="primary"
-        class="load-by-id"
+        size="mini"
         @click="() => changeVisibleFormById()"
       >
-      {{  isVisibleLoadFormById ? "Отмена" : "Загрузить по id"  }}
+        {{  isVisibleLoadFormById ? "Отмена" : "Загрузить по id"  }}
       </ElButton>
-      <div v-if="isVisibleLoadFormById" class="cinema-form__load-by-id">
-        <ElInput v-model="id" placeholder="ID фильма"/>
-        <ElButton icon="el-icon-download" circle @click="() => loadFilmFromApi()" />
+      <div v-if="isVisibleLoadFormById" class="cinema-form__load-by-id__form">
+        <ElInput v-model="id" size="mini" placeholder="ID фильма"/>
+        <ElButton icon="el-icon-download" size="mini" type="success" @click="() => loadFilmFromApi()" />
       </div>
     </div>
     <div class="cinema-form__field">
-      <ElInput v-model="form.name" placeholder="Название фильма" />
+      <span class="cinema-form__field__label">Название:</span>
+      <ElInput v-model="form.name" placeholder="Название" />
     </div>
     <div class="cinema-form__field">
+      <span class="cinema-form__field__label">Оригинальное название:</span>
       <ElInput v-model="form.originName" placeholder="Оригинальное название" />
     </div>
     <div class="cinema-form__field">
-      <ElInput v-model="form.producer" placeholder="Режиссер" />
+      <span class="cinema-form__field__label">Тип:</span>
+      <div>
+        <ElSelect v-model="form.type" class="w-100" placeholder="Тип">
+          <ElOption
+            v-for="filter in filterTypes"
+            :key="filter.value"
+            :label="filter.label"
+            :value="filter.value"
+          />
+        </ElSelect>
+      </div>
     </div>
     <div class="cinema-form__field">
+      <span class="cinema-form__field__label">Год:</span>
       <ElDatePicker
         v-model="form.year"
         type="year"
@@ -32,23 +45,42 @@
       />
     </div>
     <div class="cinema-form__field">
+      <span class="cinema-form__field__label">Ссылка на обложку:</span>
       <ElInput v-model="form.previewUrl" placeholder="Ссылка на обложку" />
     </div>
-    <div v-if="form.kinopoiskId" class="cinema-form__field">
+    <div class="cinema-form__field">
+      <span class="cinema-form__field__label">Кинопоиск ID:</span>
       <ElInput v-model="form.kinopoiskId" placeholder="Кинопоиск ID" />
     </div>
     <div class="cinema-form__field">
-      <span>Оценка фильма</span>
-      <ElRate v-model="form.score" :colors="getSroceIcons" class="cinema-form__field" :max="10" />
+      <span class="cinema-form__field__label">Оценка фильма<span v-if="form.score"> ({{ form.score }})</span>:</span>
+      <ElRate v-model="form.score" :colors="getScoreIcons" :max="10" />
     </div>
-    <div class="cinema-form__field">
+    <div class="cinema-form__submit">
       <ElButton type="success" @click="() => handleClick()">{{ btnText }}</ElButton>
+
+      <ElTag v-if="!editMode && invalidIdKP" type="danger">Такой фильм скорее всего уже есть в списке</ElTag>
     </div>
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+
+const listTypes = [
+  {
+    value: "",
+    label: "Не выбрано"
+  },
+  {
+    value: "SERIAL",
+    label: "Сериал"
+  },
+  {
+    value: "FILM",
+    label: "Фильм"
+  }
+]
 
 export default {
   name: 'CinemaForm',
@@ -60,6 +92,10 @@ export default {
     cinema: {
       type: Object,
       default: () => (null)
+    },
+    editMode: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -67,11 +103,11 @@ export default {
       form: {
         name: '',
         originName: '',
-        producer: '',
         year: '',
         previewUrl: '',
         score: null,
-        kinopoiskId: ''
+        kinopoiskId: '',
+        type: "FILM"
       },
       id: null,
       isVisibleLoadFormById: false
@@ -86,8 +122,31 @@ export default {
     }
   },
   computed: {
-    getSroceIcons () {
+    ...mapGetters('cinema', [
+      'isAdmin',
+      'getFilms'
+    ]),
+    getScoreIcons () {
       return ['#99A9BF', '#F7BA2A', '#FF9900']
+    },
+    filterTypes () {
+      return listTypes
+    },
+    invalidIdKP () {
+      console.log(this.form.kinopoiskId)
+      if (this.form.kinopoiskId) {
+        return this.getFilms.some(i => String(i.kinopoiskId) === String(this.form.kinopoiskId))
+      }
+
+      return false
+    }
+  },
+  watch: {
+    'form.kinopoiskId': {
+      handler () {
+        console.log(1)
+        this.form = { ...this.form }
+      }
     }
   },
   methods: {
@@ -110,7 +169,8 @@ export default {
             year: String(data.year),
             previewUrl: data.posterUrlPreview,
             coverUrl: data.coverUrl,
-            kinopoiskId: data.kinopoiskId
+            kinopoiskId: data.kinopoiskId,
+            type: data.serial ? 'SERIAL' : 'FILM'
           }
         })
         .catch(error => {
@@ -125,12 +185,30 @@ export default {
 .cinema-form {
   &__field {
     margin-top: 16px;
+
+    &__label {
+      font-size: 14px;
+      margin-bottom: 2px;
+      color: #414141;
+    }
+  }
+
+  &__submit {
+    margin-top: 26px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
   }
 
   &__load-by-id {
     display: flex;
-    flex-direction: row;
     gap: 16px;
+    margin-top: 10px;
+
+    &__form {
+      display: flex;
+      gap: 6px;
+    }
   }
 }
 </style>

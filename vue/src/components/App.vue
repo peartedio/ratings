@@ -6,11 +6,25 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import ModalContainer from "@/components/parts/ModalContainer";
+
+const FIRST_LOAD = 'FIRST_LOAD'
 
 export default {
   components: {
     ModalContainer
+  },
+  mounted () {
+    if (!localStorage.getItem(FIRST_LOAD)) {
+      localStorage.setItem(FIRST_LOAD, 'TRUE')
+      this.resetRatings()
+    }
+  },
+  methods: {
+    ...mapActions('cinema', [
+      'resetRatings'
+    ])
   }
 }
 </script>
@@ -22,6 +36,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: @cBaseTwo;
+  font-family: @ffOne;
 }
 
 a {
@@ -69,6 +84,10 @@ h2 {
   color: #575757;
 }
 
+.w-100 {
+  width: 100%;
+}
+
 .header {
   margin-bottom: 16px;
 }
@@ -80,5 +99,9 @@ h2 {
   justify-content: center;
   font-family: @ffOne;
   color: #727272;
+}
+
+.el-message-box {
+  font-family: @ffOne !important;
 }
 </style>
