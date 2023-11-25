@@ -6,11 +6,25 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import ModalContainer from "@/components/parts/ModalContainer";
+
+const FIRST_LOAD = 'FIRST_LOAD'
 
 export default {
   components: {
     ModalContainer
+  },
+  mounted () {
+    if (!localStorage.getItem(FIRST_LOAD)) {
+      localStorage.setItem(FIRST_LOAD, 'TRUE')
+      this.resetRatings()
+    }
+  },
+  methods: {
+    ...mapActions('cinema', [
+      'resetRatings'
+    ])
   }
 }
 </script>
@@ -22,6 +36,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: @cBaseTwo;
+  font-family: @ffOne;
 }
 
 a {
@@ -57,39 +72,36 @@ h2 {
   display: flex;
 }
 
+.gap-20 {
+  gap: 20px;
+}
+
+.fs-12 {
+  font-size: 12px;
+}
+
+.c-gray {
+  color: #575757;
+}
+
+.w-100 {
+  width: 100%;
+}
+
 .header {
   margin-bottom: 16px;
 }
 
-.rcms {
+.page-msg {
+  display: flex;
+  height: 200px;
+  align-items: center;
+  justify-content: center;
+  font-family: @ffOne;
+  color: #727272;
+}
 
-  &-divider {
-
-    &-h {
-      width: 100%;
-      height: @sizeBorderDefault;
-      background-color: @cBaseTwo;
-    }
-
-    &-v {
-
-    }
-  }
-
-  &-loading {
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 1;
-      background: rgba(100, 100, 100, 0.5);
-      cursor: wait;
-    }
-  }
+.el-message-box {
+  font-family: @ffOne !important;
 }
 </style>

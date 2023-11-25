@@ -1,12 +1,8 @@
 <template>
   <PageLayout>
-    <div class="header">
-      <RouterLink :to="{ name: routeNames.LIST_CINEMA }" replace>
-        <ElButton type="primary" icon="el-icon-arrow-left">Главная страница</ElButton>
-      </RouterLink>
-    </div>
     <section class="p-16">
-      <CinemaForm :btnText="editCinemaBtnText" :cinema="cinema" @btnClick="(cinema) => changeCinema(cinema)" />
+      <h1>Редактирование фильма</h1>
+      <CinemaForm btnText="Сохранить изменения" :edit-mode="true" :cinema="cinema" @btnClick="(cinema) => changeCinema(cinema)" />
     </section>
   </PageLayout>
 </template>
@@ -16,23 +12,17 @@ import PageLayout from '../parts/PageLayout'
 import CinemaForm from "../forms/CinemaForm"
 import { helpCinema } from "@/mixins/cinema"
 import { RouteNames } from '@/router/routes'
-import { RouterLink } from 'vue-router'
 
 export default {
   name: 'EditCinema',
   mixins: [helpCinema],
   components: {
     PageLayout,
-    RouterLink,
     CinemaForm
   },
   computed: {
     cinema () {
-      const cinemaId = this.$route.params.id
-      return this.getFilm(cinemaId)
-    },
-    editCinemaBtnText () {
-      return "Сохранить изменения"
+      return this.getFilm(this.$route.params.id)
     },
     routeNames() {
       return RouteNames
@@ -41,7 +31,7 @@ export default {
   methods: {
     changeCinema (cinema) {
       this.editCinema(cinema)
-      this.$router.push({ name: RouteNames.LIST_CINEMA })
+      this.$router.push({ name: RouteNames.CINEMA_DETAILS, params: { id: cinema.id } })
     }
   }
 }

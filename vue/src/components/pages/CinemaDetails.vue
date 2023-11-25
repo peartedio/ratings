@@ -1,27 +1,32 @@
 <template>
   <PageLayout>
-    <div class="header">
-      <RouterLink :to="{ name: routeNames.LIST_CINEMA }" replace>
-        <ElButton type="primary" icon="el-icon-arrow-left">Главная страница</ElButton>
-      </RouterLink>
-    </div>
-    <section class="p-16">
+    <section v-if="cinema" class="p-16">
       <div class="cinema-details">
-        <div class="cinema-details__header">
-          <ElRate v-model="getScore" disabled :colors="getSroceIcons" />
-          <div class="cinema-details__header__buttons">
+        <div class="cinema-details__preview">
+          <img class="cinema-details__image" :src="cinema.previewUrl || '/files/film.png'" />
+        </div>
+        <div class="cinema-details__info">
+          <div class="cinema-details__info__item">{{ cinema.name }} <span v-if="cinema.year">({{ cinema.year }})</span></div>
+          <div v-if="cinema.originName" class="cinema-details__info__origin-name fs-12 c-gray">{{ cinema.originName }}</div>
+          <div class="cinema-details__info__item">
+          <span style="color: green">
+            {{ rating || '0' }}
+            <i class="el-icon-s-flag" style="color: green" />
+          </span>
+            <span style="color: orange">
+            {{ cinema.score || '-' }}
+            <i class="el-icon-star-on" style="color: orange" />
+          </span>
+          </div>
+          <div class="cinema-details__buttons" @click.stop>
+            <a v-if="cinema.kinopoiskId" :href="'https://www.kinopoisk.ru/film/' + cinema.kinopoiskId" target="_blank">
+              <ElButton type="warning" icon="el-icon-video-camera-solid" circle />
+            </a>
             <RouterLink :to="{ name: routeNames.EDIT_CINEMA, params: { id: cinema.id } }">
               <ElButton type="primary" icon="el-icon-edit" circle />
             </RouterLink>
-            <ElButton type="danger" icon="el-icon-delete" circle @click="() => deleteCinema()" />
+            <ElButton type="danger" icon="el-icon-delete" circle @click="() => deleteCinema(cinema)" />
           </div>
-        </div>
-        <div class="cinema-card__preview" :style="previewStyle"/>
-        <div class="cinema-details__info">
-          <div class="cinema-details__info__item cinema-details__info__name">{{ cinema.name }}</div>
-          <div class="cinema-details__info__item">Оригинальное название: {{ cinema.originName }}</div>
-          <div class="cinema-details__info__item">Режиссер: {{ cinema.producer }}</div>
-          <div class="cinema-details__info__item">Год: {{ cinema.year }}</div>
         </div>
       </div>
     </section>
@@ -31,17 +36,18 @@
 <script>
 import PageLayout from '../parts/PageLayout'
 import { helpCinema } from "@/mixins/cinema";
-import { RouterLink } from 'vue-router'
 import { RouteNames } from '@/router/routes'
 
 export default {
   name: 'CinemaDetails',
   mixins: [helpCinema],
   components: {
-    PageLayout,
-    RouterLink
+    PageLayout
   },
   computed: {
+    rating () {
+      return this.getRatingFilms[this.cinema.id]
+    },
     getScore () {
       return this.cinema ? this.cinema.score : 0
     },
@@ -49,15 +55,14 @@ export default {
       return ['#99A9BF', '#F7BA2A', '#FF9900']
     },
     cinema () {
-      const cinemaId = this.$route.params.id
-      return this.getFilm(cinemaId)
+      return this.getFilm(this.$route.params.id)
     },
     routeNames() {
       return RouteNames
     },
     previewStyle () {
       return {
-        backgroundImage: `url(${this.cinema.coverUrl || ''})`,
+        backgroundImage: `url(${this.cinema.previewUrl || ''})`,
         backgroundSize: `cover`,
         backgroundPosition: `center`
       }
@@ -73,45 +78,72 @@ export default {
 </script>
 
 <style scoped lang="less">
+@pd: 6px;
 .cinema-details {
-  display: grid;
-  grid-template:
-    "header" auto
-    "cover" 300px
-    "info" auto;
-  gap: 16px;
+  display: flex;
+  position: relative;
+  border-radius: 8px;
+  padding: @pd;
+  transition: 200ms;
+  gap: 10px;
 
-  &__header {
-    grid-area: header;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
     align-items: center;
-
-    &__buttons {
-      display: flex;
-      flex-direction: row;
-      justify-content: end;
-      gap: 16px
-    }
+    gap: 20px;
   }
 
   &__preview {
-    grid-area: cover;
-    background: #bababa;
-    background-size: cover;
-    background-position: center;
+    width: 100%;
+    max-width: 300px;
+    max-height: 420px;
+    border-radius: 8px;
+    overflow: hidden;
+
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__image {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__score {
+    margin-top: 8px;
+    display: flex;
+    font-size: 12px;
+    align-items: center;
   }
 
   &__info {
-    grid-area: info;
+    color: #343434;
+    font-family: @ffOne;
     display: flex;
     flex-direction: column;
-    gap: 16px;
 
-    &__name {
-      font-weight: 600;
+    @media screen and (max-width: 600px) {
+      text-align: center;
+    }
+
+    &__item {
       font-size: 20px;
+    }
+
+    &__origin-name {
+      font-size: 14px;
+    }
+  }
+
+  &__buttons {
+    margin-top: 10px;
+    display: flex;
+    gap: @pd;
+
+    @media screen and (max-width: 600px) {
+      justify-content: center;
     }
   }
 }

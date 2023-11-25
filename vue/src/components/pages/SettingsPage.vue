@@ -1,10 +1,5 @@
 <template>
   <PageLayout>
-    <div class="header">
-      <RouterLink :to="{ name: routeNames.HOME }" replace>
-        <ElButton type="primary" icon="el-icon-arrow-left">Главная страница</ElButton>
-      </RouterLink>
-    </div>
     <section class="p-16">
       <div class="settings">
         <h1>Настройки</h1>
@@ -16,13 +11,13 @@
             plain
             @click="() => saveApiKey()"
           >
-          Сохранить ключ
+            Сохранить ключ
           </ElButton>
         </div>
         <div class="settings__buttons">
           <a
             :href="downloadRef"
-            class="el-button el-icon-upload2"
+            class="el-button el-icon-download"
             download="films.json"
           >
             <span>Экспорт данных</span>
@@ -37,10 +32,10 @@
           >
             <ElButton
               type="primary"
-              icon="el-icon-download"
+              icon="el-icon-upload2"
               plain
             >
-            Импорт данных
+              Импорт данных
             </ElButton>
           </ElUpload>
         </div>
@@ -52,14 +47,12 @@
 <script>
 import PageLayout from '../parts/PageLayout'
 import { mapMutations, mapActions, mapGetters } from 'vuex'
-import { RouterLink } from 'vue-router'
 import { RouteNames } from '@/router/routes'
 
 export default {
   name: 'SettingsPage',
   components: {
-    PageLayout,
-    RouterLink
+    PageLayout
   },
   data () {
     return {
@@ -69,17 +62,14 @@ export default {
   computed: {
     ...mapGetters('cinema', [
       'getFilms',
+      'getJSON',
       'getRatingFilms'
     ]),
     routeNames () {
       return RouteNames
     },
     downloadRef () {
-      const data = {
-        films: this.getFilms,
-        rating: this.getRatingFilms
-      }
-      return 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data))
+      return 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.getJSON))
     }
   },
   methods: {

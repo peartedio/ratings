@@ -7,4 +7,5 @@ services:
             - "9999:8080"
         volumes:
             - ./vue/src:/vue/src
+            - ./vue/public:/vue/public
             - ./vue/package.json:/vue/package.json
