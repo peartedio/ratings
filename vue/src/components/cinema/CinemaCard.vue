@@ -20,7 +20,8 @@
           </span>
         </div>
         <div v-if="tags.length > 0" class="cinema-card__tags" >
-          <img v-for="tag in tags"
+          <img
+            v-for="tag in tags"
             :key="tag.key"
             class="cinema-card__tags__item"
             :src="tag.image"
