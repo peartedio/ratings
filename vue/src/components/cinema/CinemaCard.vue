@@ -19,6 +19,14 @@
             <i class="el-icon-star-on" style="color: orange" />
           </span>
         </div>
+        <div v-if="tags.length > 0" class="cinema-card__tags" >
+          <img v-for="tag in tags"
+            :key="tag.key"
+            class="cinema-card__tags__item"
+            :src="tag.image"
+            :alt="tag.title"
+            :title="tag.title" />
+        </div>
         <div class="cinema-card__buttons">
           <a v-if="cinema.kinopoiskId" @click.stop :href="'https://www.kinopoisk.ru/film/' + cinema.kinopoiskId" target="_blank">
             <ElButton type="warning" icon="el-icon-video-camera-solid" size="mini" circle />
@@ -52,6 +60,10 @@ export default {
     index: {
       type: Number,
       default: 0
+    },
+    tags: {
+      type: Array,
+      default: () => []
     }
   },
   computed: {
@@ -131,6 +143,16 @@ export default {
     gap: @pd;
     flex: 1;
     align-items: end;
+  }
+
+  &__tags {
+    margin-top: 4px;
+
+    &__item {
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+    }
   }
 }
 </style>

@@ -18,6 +18,14 @@
             <i class="el-icon-star-on" style="color: orange" />
           </span>
           </div>
+          <div v-if="tags.length > 0" class="cinema-details__tags" >
+            <img v-for="tag in tags"
+                 :key="tag.key"
+                 class="cinema-details__tags__item"
+                 :src="tag.image"
+                 :alt="tag.title"
+                 :title="tag.title" />
+          </div>
           <div class="cinema-details__buttons" @click.stop>
             <a v-if="cinema.kinopoiskId" :href="'https://www.kinopoisk.ru/film/' + cinema.kinopoiskId" target="_blank">
               <ElButton type="warning" icon="el-icon-video-camera-solid" circle />
@@ -26,6 +34,11 @@
               <ElButton type="primary" icon="el-icon-edit" circle />
             </RouterLink>
             <ElButton type="danger" icon="el-icon-delete" circle @click="() => deleteCinema(cinema)" />
+          </div>
+          <div v-if="cinema.description" class="cinema-details__info__description">{{ cinema.description }}</div>
+          <div v-if="cinema.review" class="cinema-details__info__review">
+            <div class="cinema-details__info__review__title" >Отзыв:</div>
+            {{ cinema.review }}
           </div>
         </div>
       </div>
@@ -56,6 +69,9 @@ export default {
     },
     cinema () {
       return this.getFilm(this.$route.params.id)
+    },
+    tags () {
+      return this.getTagsForFilm(this.cinema)
     },
     routeNames() {
       return RouteNames
@@ -134,6 +150,29 @@ export default {
 
     &__origin-name {
       font-size: 14px;
+    }
+
+    &__description {
+      font-size: 16px;
+    }
+
+    &__review {
+      font-size: 12px;
+
+      &__title {
+        font-size: 16px;
+        margin-top: 16px;
+      }
+    }
+  }
+
+  &__tags {
+    margin-top: 16px;
+
+    &__item {
+      width: 64px;
+      height: 64px;
+      margin-right: 16px;
     }
   }
 
