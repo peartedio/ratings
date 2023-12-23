@@ -45,6 +45,7 @@
         :key="cinema.id"
         :cinema="cinema"
         :rating="getRatingFilms[cinema.id]"
+        :tags="getTagsForFilm(cinema)"
         :index="isNumeration ? index + 1 : 0"
       />
     </div>
@@ -125,6 +126,7 @@ export default {
     ...mapGetters('cinema', [
       'getFilmsWithFilter',
       'getRatingFilms',
+      'getTagsForFilm'
     ]),
     filters () {
       return filters

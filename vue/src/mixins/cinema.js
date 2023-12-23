@@ -12,7 +12,8 @@ export const helpCinema = {
     ...mapGetters('cinema', [
       'getFilms',
       'getFilm',
-      'getRatingFilms'
+      'getRatingFilms',
+      'getTagsForFilm'
     ])
   }
 }

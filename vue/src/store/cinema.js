@@ -42,6 +42,29 @@ axiosInstance.defaults.headers['X-API-KEY'] = localStorage.getItem(API_KEY) || "
 
 const JSON_PATH_FILES = '/files/films.json'
 
+const CINEMA_TAGS = [
+  {
+    key: "scifi",
+    title: "Фантастика",
+    image: '/files/scifi.png'
+  },
+  {
+    key: "drama",
+    title: "Драма",
+    image: '/files/drama.png'
+  },
+  {
+    key: "commedy",
+    title: "Коммедия",
+    image: '/files/commedy.png'
+  },
+  {
+    key: "horror",
+    title: "Ужастик",
+    image: '/files/horror.png'
+  }
+]
+
 export default {
   namespaced: true,
   state: {
@@ -58,10 +81,15 @@ export default {
       depends: state.depends
     }),
     isAdmin: (state) => (state.userGroup === 'ADMIN'),
+    getAllCinemaTags: () => CINEMA_TAGS,
     getFilms: (state) => state.films,
     getFilm: (state) => (id) => state.films.find((film) => film.id == id),
     getRatingFilms: (state) => state.rating,
     getDependsFilms: (state) => state.depends,
+    getTagsForFilm: () => (film) => {
+      const tags = film.tags || []
+      return CINEMA_TAGS.filter(tag => tags.filter(t => t == tag.key).length > 0)
+    },
     getFilmsWithFilter: (state) => ({ field, reverse, type }) => {
       let films = state.films.slice()
       if (type && type !== 'ALL') {

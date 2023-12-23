@@ -22,6 +22,15 @@
       <ElInput v-model="form.originName" placeholder="Оригинальное название" />
     </div>
     <div class="cinema-form__field">
+      <span class="cinema-form__field__label">Описание:</span>
+      <ElInput 
+        v-model="form.description" 
+        placeholder="Описание" 
+        :autosize="{ minRows: 2, maxRows: 10 }"
+        type="textarea"
+      />
+    </div>
+    <div class="cinema-form__field">
       <span class="cinema-form__field__label">Тип:</span>
       <div>
         <ElSelect v-model="form.type" class="w-100" placeholder="Тип">
@@ -55,6 +64,37 @@
     <div class="cinema-form__field">
       <span class="cinema-form__field__label">Оценка фильма<span v-if="form.score"> ({{ form.score }})</span>:</span>
       <ElRate v-model="form.score" :colors="getScoreIcons" :max="10" />
+    </div>
+    <div class="cinema-form__field">
+      <span class="cinema-form__field__label">Отзыв:</span>
+      <ElInput 
+        v-model="form.review" 
+        placeholder="Отзыв" 
+        :autosize="{ minRows: 2, maxRows: 10 }"
+        type="textarea"
+      />
+    </div>
+    <div class="cinema-form__field">
+      <span class="cinema-form__field__label">Тэги:</span>
+      <div>
+        <ElSelect 
+          v-model="form.tags"
+          class="w-100" 
+          multiple
+          placeholder="Тип">
+          <ElOption
+            v-for="tag in getAllCinemaTags"
+            :key="tag.key"
+            :label="tag.title"
+            :value="tag.key"
+          >
+            <div class="cinema-form__field__tag">
+              <img class="cinema-form__field__tag__image" :src="tag.image" />
+              <span class="cinema-form__field__tag__title">{{ tag.title }}</span>
+            </div>
+          </ElOption>
+        </ElSelect>
+      </div>
     </div>
     <div class="cinema-form__submit">
       <ElButton type="success" @click="() => handleClick()">{{ btnText }}</ElButton>
@@ -103,9 +143,12 @@ export default {
       form: {
         name: '',
         originName: '',
+        description: '',
         year: '',
         previewUrl: '',
         score: null,
+        review: '',
+        tags: [],
         kinopoiskId: '',
         type: "FILM"
       },
@@ -124,7 +167,8 @@ export default {
   computed: {
     ...mapGetters('cinema', [
       'isAdmin',
-      'getFilms'
+      'getFilms',
+      "getAllCinemaTags"
     ]),
     getScoreIcons () {
       return ['#99A9BF', '#F7BA2A', '#FF9900']
@@ -166,6 +210,7 @@ export default {
             ...this.form,
             name: data.nameRu,
             originName: data.nameOriginal,
+            description: data.description,
             year: String(data.year),
             previewUrl: data.posterUrlPreview,
             coverUrl: data.coverUrl,
@@ -190,6 +235,23 @@ export default {
       font-size: 14px;
       margin-bottom: 2px;
       color: #414141;
+    }
+
+    &__tag {
+      display: inline-block;
+
+      &__image {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+
+      &__title {
+        font-size: 16px;
+        height: 32px;
+        vertical-align: middle;
+      }
     }
   }
 
