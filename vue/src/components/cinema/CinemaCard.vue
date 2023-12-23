@@ -25,7 +25,8 @@
             class="cinema-card__tags__item"
             :src="tag.image"
             :alt="tag.title"
-            :title="tag.title" />
+            :title="tag.title"
+          />
         </div>
         <div class="cinema-card__buttons">
           <a v-if="cinema.kinopoiskId" @click.stop :href="'https://www.kinopoisk.ru/film/' + cinema.kinopoiskId" target="_blank">

@@ -20,11 +20,12 @@
           </div>
           <div v-if="tags.length > 0" class="cinema-details__tags" >
             <img v-for="tag in tags"
-                 :key="tag.key"
-                 class="cinema-details__tags__item"
-                 :src="tag.image"
-                 :alt="tag.title"
-                 :title="tag.title" />
+              :key="tag.key"
+              class="cinema-details__tags__item"
+              :src="tag.image"
+              :alt="tag.title"
+              :title="tag.title"
+            />
           </div>
           <div class="cinema-details__buttons" @click.stop>
             <a v-if="cinema.kinopoiskId" :href="'https://www.kinopoisk.ru/film/' + cinema.kinopoiskId" target="_blank">

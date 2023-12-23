@@ -27,7 +27,8 @@
         v-model="form.description" 
         placeholder="Описание" 
         :autosize="{ minRows: 2, maxRows: 10 }"
-        type="textarea" />
+        type="textarea"
+      />
     </div>
     <div class="cinema-form__field">
       <span class="cinema-form__field__label">Тип:</span>
@@ -70,7 +71,8 @@
         v-model="form.review" 
         placeholder="Отзыв" 
         :autosize="{ minRows: 2, maxRows: 10 }"
-        type="textarea" />
+        type="textarea"
+      />
     </div>
     <div class="cinema-form__field">
       <span class="cinema-form__field__label">Тэги:</span>

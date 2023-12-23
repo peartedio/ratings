@@ -87,7 +87,7 @@ export default {
     getRatingFilms: (state) => state.rating,
     getDependsFilms: (state) => state.depends,
     getTagsForFilm: () => (film) => {
-      let tags = film.tags || []
+      const tags = film.tags || []
       return CINEMA_TAGS.filter(tag => tags.filter(t => t == tag.key).length > 0)
     },
     getFilmsWithFilter: (state) => ({ field, reverse, type }) => {
