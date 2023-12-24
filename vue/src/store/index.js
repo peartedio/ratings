@@ -1,5 +1,6 @@
 import modals from './modals'
 import cinema from './cinema'
+import audio from './audio'
 
 export default {
   namespaced: true,
@@ -8,6 +9,7 @@ export default {
   mutations: {},
   modules: {
     modals,
-    cinema
+    cinema,
+    audio
   }
 }

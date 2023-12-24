@@ -39,6 +39,40 @@
             </ElButton>
           </ElUpload>
         </div>
+        <div class="settings__field">
+          <ElSwitch 
+            v-model="audioForm.youtubeVideo"
+            active-text="Использовать youtube видео"
+            inactive-text="Использовать стаднартный аудио файл"
+          />
+        </div>
+        <div v-if="audioForm.youtubeVideo" class="settings__field">
+          <ElInput v-model="audioForm.youtubeId" placeholder="ID youtube видео"/>
+        </div>
+        <div v-if="!audioForm.youtubeVideo" class="settings__field">
+          <ElSelect 
+            v-model="audioForm.pathToFile" 
+            placeholder="Аудио файл"
+            class="w-100" 
+          >
+            <ElOption
+              v-for="audioFile in getAudioFiles"
+              :key="audioFile.file"
+              :label="audioFile.name"
+              :value="audioFile.file"
+            />
+          </ElSelect>
+        </div>
+        <div class="settings__field">
+          <ElButton
+            type="success"
+            icon="el-icon-check"
+            plain
+            @click="() => editAudio()"
+          >
+            Сохранить настройки аудио
+          </ElButton>
+        </div>
       </div>
     </section>
   </PageLayout>
@@ -56,7 +90,12 @@ export default {
   },
   data () {
     return {
-      keyApi: ''
+      keyApi: '',
+      audioForm: {
+        pathToFile: '',
+        youtubeVideo: false,
+        youtubeId: ''
+      },
     }
   },
   computed: {
@@ -65,6 +104,10 @@ export default {
       'getJSON',
       'getRatingFilms'
     ]),
+    ...mapGetters('audio', [
+      'getAudio',
+      'getAudioFiles'
+    ]),
     routeNames () {
       return RouteNames
     },
@@ -72,15 +115,29 @@ export default {
       return 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.getJSON))
     }
   },
+  mounted: function () {
+    if (this.getAudio) {
+      this.audioForm = {
+        ...this.audioForm,
+        ...this.getAudio
+      }
+    }
+  },
   methods: {
     ...mapMutations('cinema', {
       saveApiKeyFoStore: 'saveApiKey'
+    }),
+    ...mapMutations('audio', {
+      editAudioFoStore: 'editAudio'
     }),
     ...mapActions('cinema', {
       saveDataToStore: 'importDataFromFile'
     }),
     saveApiKey () {
       this.saveApiKeyFoStore(this.keyApi)
+    },
+    editAudio () {
+      this.editAudioFoStore(this.audioForm)
     },
     importData (file) {
       this.saveDataToStore(file)
@@ -108,6 +165,10 @@ export default {
     display: flex;
     flex-direction: row;
     gap: 16px;
+  }
+
+  &__field {
+    margin-top: 16px;
   }
 
   &__buttons {

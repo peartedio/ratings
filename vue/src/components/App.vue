@@ -1,5 +1,6 @@
 <template>
   <div>
+    <AudioButton />
     <RouterView />
     <ModalContainer />
   </div>
@@ -8,12 +9,14 @@
 <script>
 import { mapActions } from 'vuex'
 import ModalContainer from "@/components/parts/ModalContainer";
+import AudioButton from "@/components/audio/AudioButton";
 
 const FIRST_LOAD = 'FIRST_LOAD'
 
 export default {
   components: {
-    ModalContainer
+    ModalContainer,
+    AudioButton
   },
   mounted () {
     if (!localStorage.getItem(FIRST_LOAD)) {
