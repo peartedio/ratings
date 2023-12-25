@@ -43,7 +43,7 @@
           <ElSwitch 
             v-model="audioForm.youtubeVideo"
             active-text="Использовать youtube видео"
-            inactive-text="Использовать стаднартный аудио файл"
+            inactive-text="Использовать стандартный аудио файл"
           />
         </div>
         <div v-if="audioForm.youtubeVideo" class="settings__field">

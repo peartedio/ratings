@@ -14,7 +14,8 @@
       :src="'https://www.youtube.com/embed/' + getAudio.youtubeId + '?rel=0?version=3&showinfo=0&loop=1&playlist=' + getAudio.youtubeId + '&enablejsapi=1'"
       frameborder="0"
       allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen ref="youtubePlayer" 
+      allowfullscreen 
+      ref="youtubePlayer" 
     />
     <ElButton 
       type="success" 
@@ -48,12 +49,7 @@ export default {
   methods: {
     togglePlay() {
       if (this.getAudio.youtubeVideo) {
-        var message = ""
-        if (this.isPlaying) {
-          message = 'pauseVideo';
-        } else {
-          message = 'playVideo';
-        }
+        const message = this.isPlaying ? 'pauseVideo' : 'playVideo'
         const iframe = this.$refs.youtubePlayer.contentWindow;
         iframe.postMessage(
           '{"event":"command","func":"' + message + '","args":""}',
@@ -69,7 +65,7 @@ export default {
       this.isPlaying = !this.isPlaying;
     },
     endListener() {
-      var audio = this.$refs.player;
+      const audio = this.$refs.player;
       audio.currentTime = 0;
       audio.play();
     }
